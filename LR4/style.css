@@ -1,0 +1,145 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #333333;
+    line-height: 1.5;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 30px;
+}
+
+header {
+    background-color: #f5efe8;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 36px;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+a {
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    color: #000000;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff5722;
+}
+
+main {
+    margin-bottom: 40px;
+}
+
+section {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 10px;
+}
+
+h2 {
+    font-size: 24px;
+    color: #000000;
+    margin-bottom: 15px;
+    margin-top: 20px;
+}
+
+img {
+    display: block;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 8px;
+    margin: 0 auto 15px;
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #000000;
+    text-align: center;
+}
+
+th {
+    font-weight: bold;
+}
+
+.center-title {
+    text-align: center;
+}
+
+/* Подвал */
+footer {
+    background-color: black;
+    color: white;
+    padding: 30px;
+    margin-top: 30px;
+    border-radius: 8px;
+}
+
+.footer-content {
+    display: flex;
+    gap: 60px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.footer-block {
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-block h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #f5efe8;
+}
+
+.footer-block p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.footer-bottom {
+    border-top: 1px solid #333333;
+    padding-top: 15px;
+    font-size: 13px;
+    color: #999999;
+    text-align: center;
+}
