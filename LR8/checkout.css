@@ -1,0 +1,32 @@
+/* Дополнительные стили для страницы оформления */
+
+/* Убираем фоновую тень у карточек в составе заказа, чтобы они не сливались с фоном формы */
+#checkout-dishes .dish {
+    filter: none;
+    border: 1px solid #e5e0d8;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Стили для кнопки "Удалить" */
+#checkout-dishes .dish button {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+#checkout-dishes .dish button:hover {
+    background-color: #f5c6cb;
+}
+
+/* Делаем кнопку сброса серой */
+#clear-btn {
+    background-color: #6c757d;
+    color: white;
+}
+#clear-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Стили для контейнера состава заказа */
+.order-composition {
+    max-width: 900px;
+    margin: 0 auto 40px;
+}
