@@ -1,0 +1,353 @@
+<!-- 
+
+  Проект выполнен в одном файле game.html и использует HTML, CSS и JavaScript.
+
+  1. Структура и интерфейс:
+     - HTML размечает карточку игры: блок со статистикой (уровень, таймер, счет), поле для вопроса, инпут для ответа и кнопки.
+     - CSS делает интерфейс современным (тени, скругления, центрирование).
+
+  2. Логика игры (JavaScript):
+     - Состояние игры (State): хранится в переменных (currentLevel, correctCount, questionCount, timeLeft).
+     - Генерация вопросов: функция generateQuestion() создает примеры в зависимости от уровня (1 - сложение, 2 - умножение, 3 - деление). 
+       Для защиты от повторов используется коллекция Set (usedQuestions).
+     - Проверка ответов: функция checkAnswer() сравнивает ввод пользователя с правильным ответом и обновляет счетчики.
+     - Условие перехода: на каждом уровне ровно 5 вопросов. Чтобы пройти дальше, нужно ответить правильно минимум на 4 из них. Это проверяется в функции checkLevelEnd().
+     - Таймер: функция startTimer() использует setInterval для отсчета 5 минут. Если время вышло, игра заканчивается.
+     - Перезапуск: кнопка "Начать заново" (restartGame) сбрасывает счетчики и таймер, но НЕ сбрасывает текущий уровень (currentLevel), позволяя переиграть именно тот уровень, где была допущена ошибка.
+     - Конец игры: если пользователь набирает меньше 4 правильных ответов, игра останавливается и выводит сообщение о поражении.
+-->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+        .stats {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+            text-align: left;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .stats p {
+            margin: 5px 0;
+        }
+        .question-area {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #222;
+            min-height: 45px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 18px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        input[type="text"]:focus {
+            border-color: #28a745;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            min-height: 25px;
+        }
+        .correct-text { color: #28a745; }
+        .incorrect-text { color: #dc3545; }
+        .controls {
+            margin-top: 20px;
+        }
+        #restart-btn {
+            background-color: #007bff;
+            display: none;
+        }
+        #next-level-btn {
+            background-color: #ffc107;
+            color: #212529;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Math Game</h1>
+        
+        <div class="stats">
+            <p>Уровень: <span id="level-name">Сложение</span></p>
+            <p>Время: <span id="timer">05:00</span></p>
+            <p>Правильных: <span id="correct-count">0</span> | Неправильных: <span id="incorrect-count">0</span></p>
+            <p>Вопрос: <span id="question-counter">1</span> / 5</p>
+        </div>
+
+        <div class="question-area" id="question">Загрузка...</div>
+        
+        <input type="text" id="answer-input" placeholder="Введите ответ" autocomplete="off">
+        <br>
+        <button id="submit-btn">Ответить</button>
+        
+        <div class="feedback" id="feedback"></div>
+
+        <div class="controls">
+            <button id="next-level-btn">Следующий уровень</button>
+            <button id="restart-btn">Начать заново</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+        let questionCount = 1;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let currentAnswer = null;
+        let usedQuestions = new Set();
+        let timeLeft = 300;
+        let timerInterval;
+
+        const levelNames = { 
+            1: 'Сложение', 
+            2: 'Умножение', 
+            3: 'Деление'
+        };
+
+        const elLevel = document.getElementById('level-name');
+        const elTimer = document.getElementById('timer');
+        const elCorrect = document.getElementById('correct-count');
+        const elIncorrect = document.getElementById('incorrect-count');
+        const elQuestionCounter = document.getElementById('question-counter');
+        const elQuestion = document.getElementById('question');
+        const elInput = document.getElementById('answer-input');
+        const elSubmit = document.getElementById('submit-btn');
+        const elFeedback = document.getElementById('feedback');
+        const elNextBtn = document.getElementById('next-level-btn');
+        const elRestartBtn = document.getElementById('restart-btn');
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 300;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    gameOver("Время вышло!");
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            elTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function generateQuestion() {
+            let a, b, text, answer;
+
+            if (currentLevel === 1) {
+                a = Math.floor(Math.random() * 20) + 1;
+                b = Math.floor(Math.random() * 20) + 1;
+                answer = a + b;
+                text = `${a} + ${b}`;
+            } 
+            else if (currentLevel === 2) {
+                a = Math.floor(Math.random() * 9) + 2;
+                b = Math.floor(Math.random() * 9) + 2;
+                answer = a * b;
+                text = `${a} * ${b}`;
+            } 
+            else if (currentLevel === 3) {
+                b = Math.floor(Math.random() * 9) + 2;
+                answer = Math.floor(Math.random() * 9) + 2;
+                a = b * answer;
+                text = `${a} / ${b}`;
+            }
+
+            if (usedQuestions.has(text)) {
+                return generateQuestion();
+            }
+            usedQuestions.add(text);
+
+            currentAnswer = answer.toString();
+            elQuestion.textContent = text;
+        }
+
+        function checkAnswer() {
+            const userAnswer = elInput.value.trim();
+            if (userAnswer === '') return;
+
+            elSubmit.disabled = true;
+            elInput.disabled = true;
+
+            if (userAnswer === currentAnswer) {
+                correctCount++;
+                elCorrect.textContent = correctCount;
+                elFeedback.textContent = "Верно!";
+                elFeedback.className = "feedback correct-text";
+            } else {
+                incorrectCount++;
+                elIncorrect.textContent = incorrectCount;
+                elFeedback.textContent = `Ошибка! Правильный ответ: ${currentAnswer}`;
+                elFeedback.className = "feedback incorrect-text";
+            }
+
+            if (questionCount >= 5) {
+                clearInterval(timerInterval);
+                checkLevelEnd();
+            } else {
+                questionCount++;
+                elQuestionCounter.textContent = questionCount;
+                setTimeout(() => {
+                    elFeedback.textContent = "";
+                    elInput.value = "";
+                    elInput.disabled = false;
+                    elSubmit.disabled = false;
+                    elInput.focus();
+                    generateQuestion();
+                }, 1500);
+            }
+        }
+
+        function checkLevelEnd() {
+            // ИЗМЕНЕНИЕ: Теперь для перехода нужно минимум 4 правильных ответа
+            if (correctCount >= 4) {
+                if (currentLevel === 3) {
+                    gameOver("Поздравляем! Вы прошли игру полностью!", true);
+                } else {
+                    elFeedback.textContent = "Уровень пройден!";
+                    elFeedback.className = "feedback correct-text";
+                    elNextBtn.style.display = "inline-block";
+                }
+            } else {
+                // ИЗМЕНЕНИЕ: Текст ошибки тоже обновлен на "из 5 нужно 4"
+                gameOver(`Вы ответили правильно только на ${correctCount} из 5. Нужно 4 для перехода.`, false);
+            }
+        }
+
+        function gameOver(message, isWin = false) {
+            elQuestion.textContent = "";
+            elInput.style.display = "none";
+            elSubmit.style.display = "none";
+            elFeedback.textContent = message;
+            elFeedback.className = isWin ? "feedback correct-text" : "feedback incorrect-text";
+            elRestartBtn.style.display = "inline-block";
+            elNextBtn.style.display = "none";
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            elLevel.textContent = levelNames[currentLevel];
+            
+            questionCount = 1;
+            correctCount = 0;
+            incorrectCount = 0;
+            usedQuestions.clear();
+            
+            elQuestionCounter.textContent = questionCount;
+            elCorrect.textContent = correctCount;
+            elIncorrect.textContent = incorrectCount;
+            
+            elFeedback.textContent = "";
+            elNextBtn.style.display = "none";
+            elInput.style.display = "block";
+            elSubmit.style.display = "inline-block";
+            elInput.disabled = false;
+            elSubmit.disabled = false;
+            elInput.value = "";
+            
+            startTimer();
+            generateQuestion();
+            elInput.focus();
+        }
+
+        function restartGame() {
+            elLevel.textContent = levelNames[currentLevel];
+            
+            questionCount = 1;
+            correctCount = 0;
+            incorrectCount = 0;
+            usedQuestions.clear();
+            
+            elQuestionCounter.textContent = questionCount;
+            elCorrect.textContent = correctCount;
+            elIncorrect.textContent = incorrectCount;
+            
+            elFeedback.textContent = "";
+            elRestartBtn.style.display = "none";
+            elNextBtn.style.display = "none";
+            elInput.style.display = "block";
+            elSubmit.style.display = "inline-block";
+            elInput.disabled = false;
+            elSubmit.disabled = false;
+            elInput.value = "";
+            
+            startTimer();
+            generateQuestion();
+            elInput.focus();
+        }
+
+        elSubmit.addEventListener('click', checkAnswer);
+        elInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+        elNextBtn.addEventListener('click', nextLevel);
+        elRestartBtn.addEventListener('click', restartGame);
+
+        window.onload = () => {
+            startTimer();
+            generateQuestion();
+            elInput.focus();
+        };
+    </script>
+</body>
+</html>
