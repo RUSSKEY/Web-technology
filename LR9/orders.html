@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="orders.css">
+    <title>История заказов — КАФЕ у Дома</title>
+</head>
+<body>
+
+    <header>
+        <h1>КАФЕ у Дома</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">О нас</a></li>
+                <li><a href="menu.html">Собрать ланч</a></li>
+                <li><a href="checkout.html">Оформить заказ</a></li>
+                <li><a href="orders.html" class="active">Заказы</a></li>
+                <li><a href="index.html#contacts">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="orders-section">
+            <h2>История заказов</h2>
+            <div class="table-wrapper">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Дата оформления</th>
+                            <th>Состав заказа</th>
+                            <th>Стоимость</th>
+                            <th>Время доставки</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-list">
+                        <!-- Сюда будут вставляться заказы через JS -->
+                        <tr><td colspan="6" style="text-align:center;">Загрузка данных...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contacts">
+        <div class="footer-content">
+            <div class="footer-block">
+                <h3>КАФЕ у Дома</h3>
+                <p>Уютное место с домашней кухней в центре Москвы</p>
+            </div>
+            <div class="footer-block">
+                <h3>Контакты</h3>
+                <p>+7-916-333-23-23</p>
+                <p>hello@cafe-u-doma.ru</p>
+            </div>
+            <div class="footer-block">
+                <h3>Мы находимся</h3>
+                <p>Вселенная, галактика Млечный Путь, третья планета от Солнца</p>
+                <p>Работаем с 7:00 до 23:00</p>
+            </div>
+        </div>
+        <p class="footer-bottom">Если борщ не понравился — пишите на любую почту. Мы всё исправим!</p>
+    </footer>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ПРОСМОТР -->
+    <div class="modal-overlay" id="view-modal">
+        <div class="modal-content order-modal">
+            <div class="modal-header">
+                <h3>Просмотр заказа</h3>
+                <button class="close-btn" data-close="view-modal">✖</button>
+            </div>
+            <div class="modal-body" id="view-body">
+                <!-- Данные заполняются через JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" data-close="view-modal">ОК</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: РЕДАКТИРОВАНИЕ -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content order-modal">
+            <div class="modal-header">
+                <h3>Редактирование заказа</h3>
+                <button class="close-btn" data-close="edit-modal">✖</button>
+            </div>
+            <form id="edit-form">
+                <div class="modal-body">
+                    <p><strong>Дата оформления:</strong> <span id="edit-date"></span></p>
+                    
+                    <div class="form-group">
+                        <label for="edit-name">Имя получателя</label>
+                        <input type="text" id="edit-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-address">Адрес доставки</label>
+                        <input type="text" id="edit-address" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-type">Тип доставки</label>
+                            <select id="edit-type">
+                                <option value="now">Как можно скорее</option>
+                                <option value="by_time">К указанному времени</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-time">Время доставки</label>
+                            <input type="time" id="edit-time">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-phone">Телефон</label>
+                        <input type="text" id="edit-phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">Email</label>
+                        <input type="email" id="edit-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comment">Комментарий</label>
+                        <textarea id="edit-comment"></textarea>
+                    </div>
+
+                    <div class="edit-composition" id="edit-composition"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-close="edit-modal">Отмена</button>
+                    <button type="submit" class="btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: УДАЛЕНИЕ -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal-content order-modal delete-modal-content">
+            <div class="modal-header">
+                <h3>Удаление заказа</h3>
+                <button class="close-btn" data-close="delete-modal">✖</button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Вы уверены, что хотите удалить заказ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" data-close="delete-modal">Отмена</button>
+                <button class="btn-danger" id="confirm-delete">Да</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="orders.js"></script>
+</body>
+</html>

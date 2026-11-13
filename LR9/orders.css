@@ -1,0 +1,224 @@
+/* Основная секция */
+.orders-section {
+    max-width: 1000px;
+    margin: 0 auto 60px;
+}
+
+/* Обертка для таблицы (чтобы на телефонах был скролл) */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.orders-table th, .orders-table td {
+    padding: 15px 10px;
+    text-align: left;
+    border-bottom: 1px solid #e5e0d8;
+    vertical-align: top;
+}
+
+.orders-table th {
+    font-weight: bold;
+    border-bottom: 2px solid #333;
+}
+
+/* Иконки действий */
+.action-btn {
+    background: none;
+    border: none;
+    padding: 0; /* Убираем стандартные отступы кнопок */
+    cursor: pointer;
+    display: inline-flex; /* Заставляет иконки стоять в ряд */
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    transition: transform 0.2s, color 0.2s;
+    color: #555;
+}
+
+.action-btn:hover {
+    transform: scale(1.2);
+    color: #ff5722;
+}
+
+/* ===== МОДАЛЬНЫЕ ОКНА ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content.order-modal {
+    background-color: #fff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.delete-modal-content {
+    max-width: 400px !important;
+}
+
+/* Элементы внутри модалки */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Кнопки */
+.btn-primary, .btn-secondary, .btn-danger {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-primary:hover { background-color: #218838; }
+
+.btn-secondary {
+    background-color: #f1eee9;
+    color: #333;
+}
+
+.btn-secondary:hover { background-color: #e5e0d8; }
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover { background-color: #c82333; }
+
+/* Формы внутри модалки */
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Просмотр */
+.view-info-row {
+    display: flex;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+.view-info-row strong {
+    width: 150px;
+    flex-shrink: 0;
+    color: #666;
+}
+
+.edit-composition {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.edit-composition h4 {
+    margin-bottom: 10px;
+}
+
+/* Запрещаем перенос строки в колонке действий и делаем её компактной */
+.orders-table th:last-child,
+.orders-table td:last-child {
+    white-space: nowrap;
+    width: 1%;
+}
